@@ -7,5 +7,7 @@ public func routes(_ router: Router) throws {
         return "Hello, world!"
     }
 
+    let lc = LoginUserController()
+    try lc.boot(router: router)
     
 }
