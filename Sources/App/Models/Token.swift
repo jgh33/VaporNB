@@ -4,8 +4,8 @@ import Vapor
 import FluentPostgreSQL
 import Crypto
 
-let longTokenTimeInterval: TimeInterval = 60 * 60 * 24 * 30   //30天
-let shortTokenTimeInterval: TimeInterval = 60 * 60 * 2        //2 hours
+let longTokenTimeInterval: TimeInterval = 60 * 30   //30分钟
+let shortTokenTimeInterval: TimeInterval = 60 * 5   //5分钟
 
 final class Token: PostgreSQLModel {
     var id:Int?
@@ -33,10 +33,10 @@ final class Token: PostgreSQLModel {
         return self
     }
     
-    func makeNewShortToken() throws {
+    func makeNewShortToken() throws -> Self {
         self.shortTokenString = try CryptoRandom().generateData(count: 32).base64URLEncodedString()
         self.shortTokenExpiryTime = Date().timeIntervalSince1970 + shortTokenTimeInterval
-        
+        return self
     }
     
 }

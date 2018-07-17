@@ -10,13 +10,13 @@ struct LoginUserController: RouteCollection {
         sginUpRoutes.post(LoginUser.self, use: sginUpHandler)
         
         let loginRoutes = router.grouped("api", "login")
-        loginRoutes.post(LoginUser.self, use: loginHandler)
+        loginRoutes.post(LoginData.self, use: loginHandler)
         
         let shortRoutes = router.grouped("api", "short")
-        shortRoutes.post(Token.self, use: getShortTokenHandler)
+        shortRoutes.post(LongTokenData.self, use: getShortTokenHandler)
         
         let longRoutes = router.grouped("api", "long")
-        longRoutes.post(Token.self, use: getLongTokenHandler)
+        longRoutes.post(LongTokenData.self, use: getLongTokenHandler)
     }
     
     
@@ -27,6 +27,8 @@ struct LoginUserController: RouteCollection {
 //    func authenticationPhoneNumberCode(_ req: Request) throws -> Future<String> {
 //        // 验证短信手机号
 //    }
+    
+    
     
     func sginUpHandler(_ req: Request, loginUser:LoginUser) throws -> Future<HTTPStatus> {
         // 1,验证账号密码格式（账号不能纯数字，密码必须大小写结合，大于等于6位）
@@ -46,9 +48,14 @@ struct LoginUserController: RouteCollection {
       
     }
     
-    func loginHandler(_ req: Request, loginUser: LoginUser) throws -> Future<Token> {
+    
+    struct LoginData:Content {
+        var username: String
+        var password: String
+    }
+    func loginHandler(_ req: Request, loginData: LoginData) throws -> Future<Token> {
         // 1,通过账号名搜索用户
-        let searchTerm = loginUser.username
+        let searchTerm = loginData.username
         return LoginUser.query(on: req).group(.or) { or in
             or.filter(\.username == searchTerm)
             or.filter(\.phone == searchTerm)
@@ -58,7 +65,7 @@ struct LoginUserController: RouteCollection {
                     throw Abort(.badRequest)
                 }
                 // 2,验证密码
-                guard loginUser.password == user.password else {
+                guard loginData.password == user.password else {
                     throw Abort(.badRequest)
                 }
                 // 3,更新长短Token并保存
@@ -69,26 +76,25 @@ struct LoginUserController: RouteCollection {
                     
                     let newToken = try Token(userID: user.requireID())
                     return  try newToken.makeNewAllTokens().save(on: req)
-                    
                 }
-            
-                
             }
-        
-
-       
     }
     
     
     struct ShortToken: Content {
+        var userID: LoginUser.ID
         var shortTokenString: String
         var shortTokenExpiryTime: TimeInterval
     }
-    func getShortTokenHandler(_ req: Request, token:Token) throws -> Future<ShortToken> {
+    struct LongTokenData: Content {
+        var userID: LoginUser.ID
+        var longTokenString: String
+    }
+    func getShortTokenHandler(_ req: Request, longTokenData:LongTokenData) throws -> Future<ShortToken> {
 
         // 验证longToken
-        let longToken = token.longTokenString
-        return Token.query(on: req).filter(\.userID == token.userID ).filter(\.longTokenString == longToken)
+        let longToken = longTokenData.longTokenString
+        return Token.query(on: req).filter(\.userID == longTokenData.userID ).filter(\.longTokenString == longToken)
             .first().flatMap(to: ShortToken.self) { tokenTep in
                 guard let tokenTep = tokenTep else {
                     throw Abort(.badRequest)
@@ -98,20 +104,18 @@ struct LoginUserController: RouteCollection {
                     throw Abort(.badRequest)
                 }
                 // 生成短Token并保存
-                try tokenTep.makeNewShortToken()
-                return tokenTep.save(on: req).map(to: ShortToken.self) { token -> ShortToken in
-                    return ShortToken(shortTokenString: token.shortTokenString, shortTokenExpiryTime: token.shortTokenExpiryTime)
+                return try tokenTep.makeNewShortToken().save(on: req).map(to: ShortToken.self) { token -> ShortToken in
+                    return ShortToken(userID:token.userID, shortTokenString: token.shortTokenString, shortTokenExpiryTime: token.shortTokenExpiryTime)
                 }
         }
-        
-        
-
     }
     
-    func getLongTokenHandler(_ req: Request, token:Token) throws -> Future<Token> {
+    
+    
+    func getLongTokenHandler(_ req: Request, longTokenData: LongTokenData) throws -> Future<Token> {
         // 验证longToken
-        let longToken = token.longTokenString
-        return Token.query(on: req).filter(\.userID == token.userID ).filter(\.longTokenString == longToken)
+        let longToken = longTokenData.longTokenString
+        return Token.query(on: req).filter(\.userID == longTokenData.userID ).filter(\.longTokenString == longToken)
             .first().flatMap(to: Token.self) { tokenTep in
                 guard let tokenTep = tokenTep else {
                     throw Abort(.badRequest)
@@ -120,13 +124,12 @@ struct LoginUserController: RouteCollection {
                 guard tokenTep.longTokenExpiryTime > Date().timeIntervalSince1970  else {
                     throw Abort(.badRequest)
                 }
-                
                 // 生成Tokens并保存
-                try tokenTep.makeNewAllTokens()
-                return tokenTep.save(on: req)
+                return try tokenTep.makeNewAllTokens().save(on: req)
         }
-        
     }
+
+    
     
 //    测试
     func getAllTokens(_ req: Request) -> Future<[Token]> {
