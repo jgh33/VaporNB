@@ -5,6 +5,7 @@ import Authentication
 struct LoginUserController: RouteCollection {
     func boot(router: Router) throws {
         router.get("api", "tokens", use: getAllTokens)
+        router.get("api", "users", use: getAllLoginUsers)
         
         let sginUpRoutes = router.grouped("api", "sginup")
         sginUpRoutes.post(LoginUser.self, use: sginUpHandler)
@@ -134,6 +135,10 @@ struct LoginUserController: RouteCollection {
 //    测试
     func getAllTokens(_ req: Request) -> Future<[Token]> {
         return Token.query(on: req).all()
+    }
+    
+    func getAllLoginUsers(_ req: Request) -> Future<[LoginUser]> {
+        return LoginUser.query(on: req).all()
     }
     
    

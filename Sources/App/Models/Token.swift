@@ -21,7 +21,7 @@ final class Token: PostgreSQLModel {
         self.longTokenString = try CryptoRandom().generateData(count: 64).base64URLEncodedString()
         
         self.longTokenExpiryTime = Date().timeIntervalSince1970 + longTokenTimeInterval
-        self.shortTokenExpiryTime = self.longTokenExpiryTime + shortTokenTimeInterval
+        self.shortTokenExpiryTime = Date().timeIntervalSince1970 + shortTokenTimeInterval
     }
 
     func makeNewAllTokens() throws -> Self {
@@ -29,7 +29,7 @@ final class Token: PostgreSQLModel {
         self.longTokenString = try CryptoRandom().generateData(count: 64).base64URLEncodedString()
         
         self.longTokenExpiryTime = Date().timeIntervalSince1970 + longTokenTimeInterval
-        self.shortTokenExpiryTime = self.longTokenExpiryTime + shortTokenTimeInterval
+        self.shortTokenExpiryTime = Date().timeIntervalSince1970 + shortTokenTimeInterval
         return self
     }
     
