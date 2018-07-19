@@ -95,11 +95,11 @@ struct LoginUserController: RouteCollection {
         return Token.query(on: req).filter(\.userID == longTokenData.userID ).filter(\.longTokenString == longToken)
             .first().flatMap { tokenTep in
                 guard let tokenTep = tokenTep else {
-                    return try ResponseJSON<Empty>(status: .token).encode(for: req)
+                    return try ResponseJSON<Empty>(status: .longToken).encode(for: req)
                 }
                 // kan
                 guard tokenTep.longTokenExpiryTime > Date().timeIntervalSince1970  else {
-                    return try ResponseJSON<Empty>(status: .token).encode(for: req)
+                    return try ResponseJSON<Empty>(status: .longToken).encode(for: req)
                 }
                 // 生成短Token并保存
                 return try tokenTep.makeNewShortToken().save(on: req).flatMap { token in
@@ -118,11 +118,11 @@ struct LoginUserController: RouteCollection {
             .first().flatMap { tokenTep in
                 guard let tokenTep = tokenTep else {
                     
-                    return try ResponseJSON<Token>(status: .token).encode(for: req)
+                    return try ResponseJSON<Token>(status: .longToken).encode(for: req)
                 }
                 // kan
                 guard tokenTep.longTokenExpiryTime > Date().timeIntervalSince1970  else {
-                    return try ResponseJSON<Token>(status: .token).encode(for: req)
+                    return try ResponseJSON<Token>(status: .longToken).encode(for: req)
                 }
                 // 生成Tokens并保存
                 return try tokenTep.makeNewAllTokens().save(on: req).flatMap{ token in

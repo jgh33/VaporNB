@@ -41,7 +41,8 @@ enum ResponseStatus:Int,Content {
     case ok = 0
     case error = 1
     case missesPara = 2
-    case token = 3
+    case shortToken = 3
+    case longToken = 4
     case unknown = 10
     case userExist = 20
     case userNotExist = 21
@@ -56,8 +57,10 @@ enum ResponseStatus:Int,Content {
             return "请求失败"
         case .missesPara:
             return "缺少参数"
-        case .token:
-            return "Token 已失效，请重新登录"
+        case .shortToken:
+            return "shortToken 已失效，请换取新的shortToken"
+        case .longToken:
+            return "longToken 已失效，请重新登录换取"
         case .unknown:
             return "未知失败"
         case .userExist:

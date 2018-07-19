@@ -14,7 +14,7 @@ struct AuthTokenMiddleware: Middleware {
                 .first()
                 .flatMap { token in
                     guard token != nil else {
-                        return try ResponseJSON<Token>(status: .token).encode(for: request)
+                        return try ResponseJSON<Token>(status: .shortToken).encode(for: request)
                     }
                     return try next.respond(to: request)
 
