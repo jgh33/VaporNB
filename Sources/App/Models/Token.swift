@@ -7,8 +7,8 @@ import Crypto
 let longTokenTimeInterval: TimeInterval = 60 * 30   //30分钟
 let shortTokenTimeInterval: TimeInterval = 60 * 5   //5分钟
 
-final class Token: PostgreSQLModel {
-    var id:Int?
+final public class Token: PostgreSQLModel {
+    public var id:Int?
     var userID: LoginUser.ID
     var shortTokenString: String
     var longTokenString: String
@@ -43,7 +43,7 @@ final class Token: PostgreSQLModel {
 
 
 extension Token: Migration {
-    static func prepare(on connection: PostgreSQLConnection)
+    public static func prepare(on connection: PostgreSQLConnection)
         -> Future<Void> {
             // 3
             return Database.create(self, on: connection) { builder in
