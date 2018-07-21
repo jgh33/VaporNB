@@ -9,13 +9,15 @@ final class LoginUser: PostgreSQLModel {
     var username: String
     var phone: String
     var password: String
+    var key: String
 
    
  
-    init(username: String, phone: String, password: String) {
+    init(username: String, phone: String, password: String, key: String) {
         self.username = username
         self.phone = phone
         self.password = password
+        self.key = key
     }
 }
 

@@ -47,6 +47,8 @@ enum ResponseStatus:Int,Content {
     case userExist = 20
     case userNotExist = 21
     case passwordError = 22
+    case codeError = 23
+    case phoneRegistered = 24
     
     
     var desc : String {
@@ -69,6 +71,10 @@ enum ResponseStatus:Int,Content {
             return "用户不存在"
         case .passwordError:
             return "密码不正确"
+        case .codeError:
+            return "短信验证码不正确"
+        case .phoneRegistered:
+            return "手机号已被其他账号绑定"
        
             
             

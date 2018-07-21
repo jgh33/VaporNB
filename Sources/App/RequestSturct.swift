@@ -25,3 +25,14 @@ struct ShortTokenData: Content {
     var userID: LoginUser.ID
     var shortTokenString: String
 }
+
+struct PhoneData: Content {
+    var username: String
+    var phone: String
+    var code: String
+}
+
+struct UsernameAndPhoneData: Content {
+    var username: String
+    var phone: String
+}
