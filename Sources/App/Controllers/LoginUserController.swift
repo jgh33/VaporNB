@@ -2,6 +2,7 @@
 import Vapor
 import Authentication
 import Crypto
+import Foundation
 
 struct LoginUserController: RouteCollection {
     func boot(router: Router) throws {
@@ -14,7 +15,7 @@ struct LoginUserController: RouteCollection {
         let userRouter = router.grouped("api", "user")
         userRouter.post(LoginUser.self, at:"register", use: registerHandler)
         userRouter.post(LoginData.self,at: "login", use: loginHandler)
-//        userRouter.post(UsernameAndPhoneData.self, at: "verify_username_and_phone", use: <#T##(Request) throws -> ResponseEncodable#>)
+        userRouter.post(UsernameAndPhoneData.self, at: "verify_username_and_phone", use: auth)
         
         let tokenRouter = router.grouped("api", "token")
         tokenRouter.post(LongTokenData.self, at: "short", use: getShortTokenHandler)
@@ -22,9 +23,22 @@ struct LoginUserController: RouteCollection {
     }
     
     
-//    func getPhoneNumberCode(_ req: Request) throws -> Future<String> {
-//        // 发短信给手机号
-//    }
+    func getPhoneNumberCode(_ req: Request, number: String, code: String) throws -> Future<Bool>  {
+        // 发短信给手机号
+        let promise = req.eventLoop.newPromise(Bool.self)
+        
+        /// Dispatch some work to happen on a background thread
+        DispatchQueue.global() {
+            //发送短信
+            let ok = true
+            promise.succeed(result: ok)
+
+        }
+        return promise.futureResult
+        
+        
+        
+    }
 //
 //    func authenticationPhoneNumberCode(_ req: Request) throws -> Future<String> {
 //        // 验证短信手机号
@@ -44,11 +58,17 @@ struct LoginUserController: RouteCollection {
                     }
                     return try ResponseJSON<Empty>(status: .error).encode(for: req)
                 }
+                let code = "vapor"
                 //发送短信
-                
-                
-                return try ResponseJSON<Empty>(status: .ok, message: "用户名和手机均为被使用").encode(for: req)
-                
+                return  try self.getPhoneNumberCode(req, number: userAndPhone.phone, code: code).flatMap{ ok in
+                    if ok {
+                        return try ResponseJSON<Empty>(status: .ok, message: "用户名和手机均为被使用").encode(for: req)
+                    } else {
+                        return try ResponseJSON<Empty>(status: .error, message: "用户名和手机均为被使用,但是发送短信失败").encode(for: req)
+                    }
+                    
+                }
+  
         }
     }
     
@@ -164,10 +184,6 @@ struct LoginUserController: RouteCollection {
         }
     }
 
-    func getPhoneCode(_ req: Request) throws -> Future<Response> {
-        let code = "vapor"
-        return try ResponseJSON<String >(status: .ok, data: code).encode(for: req)
-    }
     
     func getLoginUserKeyHandler(_ req: Request, phoneData: PhoneData) throws -> Future<Response> {
         //验证设备（短信验证）
