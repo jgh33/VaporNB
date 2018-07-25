@@ -42,7 +42,15 @@ struct LoginUserController: RouteCollection {
         
         
     }
+    
+     //MARK: --API
+     // api - https://120.78.148.54/api/get_time_Interval
+    func getTimeInterval(_ req: Request) throws -> Future<Response> {
+        let timeInterval = Date().timeIntervalSince1970
+        return try ResponseJSON<TimeInterval>(status: .ok, data:timeInterval).encode(for: req)
+    }
 
+    // api - https://120.78.148.54/api/user/verify_username_and_phone
     // 验证用户名和手机账号是否被注册过
     func auth(_ req: Request, userAndPhone:UsernameAndPhoneData) throws -> Future<Response> {
         return LoginUser.query(on: req).group(.or) { or in
@@ -71,7 +79,9 @@ struct LoginUserController: RouteCollection {
   
         }
     }
+   
     
+    // api - https://120.78.148.54/api/user/register/(code)
     func registerHandler(_ req: Request, loginUser:LoginUser) throws -> Future<Response> {
         //验证码校验
         let code = try req.parameters.next(String.self)
@@ -102,7 +112,12 @@ struct LoginUserController: RouteCollection {
       
     }
     
+//    // api - https://120.78.148.54/api/new_password/(code)
+//    func changePasswordHandler(_ req: Request, userData:) throws -> Future<Response> {
+//        <#function body#>
+//    }
     
+    // api - https://120.78.148.54/api/user/login
     func loginHandler(_ req: Request, loginData: LoginData) throws -> Future<Response> {
         // 1,通过账号名搜索用户
         let searchTerm = loginData.username
@@ -209,7 +224,8 @@ struct LoginUserController: RouteCollection {
             
         }
     }
-  
+    
+    
     
     //MARK: --发送短信验证码,模拟测试用
     //1，注册
