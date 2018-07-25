@@ -9,11 +9,13 @@ struct LoginUserController: RouteCollection {
         // MARK: --测试用aip
         router.get("api", "tokens", use: getAllTokens)
         router.get("api", "users", use: getAllLoginUsers)
+        router.post(PasswordData.self, at:"api", "crypto", use: getPassword)
         let s = router.grouped(AuthTokenMiddleware())
         s.post("api", "token", "user", use: getMyLoginUserHandler)
         
+        
         let userRouter = router.grouped("api", "user")
-        userRouter.post(LoginUser.self, at:"register", use: registerHandler)
+        userRouter.post(LoginUser.self, at:"register", String.parameter, use: registerHandler)
         userRouter.post(LoginData.self,at: "login", use: loginHandler)
         userRouter.post(UsernameAndPhoneData.self, at: "verify_username_and_phone", use: auth)
         
@@ -22,27 +24,25 @@ struct LoginUserController: RouteCollection {
         tokenRouter.post(LongTokenData.self, at: "long", use: getLongTokenHandler)
     }
     
-    
+    //  内部api，发送短信
     func getPhoneNumberCode(_ req: Request, number: String, code: String) throws -> Future<Bool>  {
         // 发短信给手机号
         let promise = req.eventLoop.newPromise(Bool.self)
         
         /// Dispatch some work to happen on a background thread
-        DispatchQueue.global() {
+        DispatchQueue.global().async {
             //发送短信
+            
+            //
             let ok = true
             promise.succeed(result: ok)
-
         }
         return promise.futureResult
         
         
         
     }
-//
-//    func authenticationPhoneNumberCode(_ req: Request) throws -> Future<String> {
-//        // 验证短信手机号
-//    }
+
     // 验证用户名和手机账号是否被注册过
     func auth(_ req: Request, userAndPhone:UsernameAndPhoneData) throws -> Future<Response> {
         return LoginUser.query(on: req).group(.or) { or in
@@ -62,7 +62,7 @@ struct LoginUserController: RouteCollection {
                 //发送短信
                 return  try self.getPhoneNumberCode(req, number: userAndPhone.phone, code: code).flatMap{ ok in
                     if ok {
-                        return try ResponseJSON<Empty>(status: .ok, message: "用户名和手机均为被使用").encode(for: req)
+                        return try ResponseJSON<Empty>(status: .ok, message: "用户名和手机均为被使用,已发送短信验证码、、").encode(for: req)
                     } else {
                         return try ResponseJSON<Empty>(status: .error, message: "用户名和手机均为被使用,但是发送短信失败").encode(for: req)
                     }
@@ -73,6 +73,11 @@ struct LoginUserController: RouteCollection {
     }
     
     func registerHandler(_ req: Request, loginUser:LoginUser) throws -> Future<Response> {
+        //验证码校验
+        let code = try req.parameters.next(String.self)
+        guard code == "vapor" else {
+            return try ResponseJSON<Empty>(status: .codeError).encode(for: req)
+        }
         // 1,验证账号密码格式（账号不能纯数字，密码必须大小写结合，大于等于6位）
         
         // 2,验证账号是否已存在
@@ -81,6 +86,7 @@ struct LoginUserController: RouteCollection {
             or.filter(\.phone == loginUser.phone)
             }
             .first().flatMap { user in
+            
                 guard user == nil else {
                     if user!.username == loginUser.username {
                         return try ResponseJSON<Empty>(status: .userExist).encode(for: req)
@@ -115,9 +121,13 @@ struct LoginUserController: RouteCollection {
                 let key1 = dateFormatter.string(from: now1)
                 let key2 = dateFormatter.string(from: now2)
                 print(key1, key2)
-                let password1 = try HMAC.SHA1.authenticate(user.password, key: key1).hexEncodedString()
-                let password2 = try HMAC.SHA1.authenticate(user.password, key: key2).hexEncodedString()
+                let password1 = try HMAC.SHA1.authenticate(user.password, key: key1).base64EncodedString()
+                let password2 = try HMAC.SHA1.authenticate(user.password, key: key2).base64EncodedString()
 
+                print("pdata:" + loginData.password)
+                print("p+:" + user.password)
+                print("p++1:" + password1)
+                print("p++2:" + password2)
                 // 2,验证密码
                 guard loginData.password == password1 || loginData.password == password2 else {
                     return try ResponseJSON<Empty>(status: .passwordError).encode(for: req)
@@ -236,7 +246,14 @@ struct LoginUserController: RouteCollection {
                 }
             }
         }
-        
+    }
+    struct PasswordData: Content {
+        var password: String
+        var key: String
+    }
+    func getPassword(_ req: Request, pass: PasswordData) throws -> Future<Response> {
+        let s = try HMAC.SHA1.authenticate(pass.password, key: pass.key).base64EncodedString()
+        return try ResponseJSON<String>(status: .ok, data: s).encode(for: req)
     }
  
 }
