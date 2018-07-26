@@ -6,25 +6,30 @@ import Foundation
 
 struct LoginUserController: RouteCollection {
     func boot(router: Router) throws {
-        // MARK: --测试用aip
+        
         router.get("api", "tokens", use: getAllTokens)
         router.get("api", "users", use: getAllLoginUsers)
-        router.post(PasswordData.self, at:"api", "crypto", use: getPassword)
         let s = router.grouped(AuthTokenMiddleware())
         s.post("api", "token", "user", use: getMyLoginUserHandler)
         
         
+        
+        
+        router.get("api","get_time_interval", use: getTimeInterval)
+        
         let userRouter = router.grouped("api", "user")
         userRouter.post(LoginUser.self, at:"register", String.parameter, use: registerHandler)
         userRouter.post(LoginData.self,at: "login", use: loginHandler)
-        userRouter.post(UsernameAndPhoneData.self, at: "verify_username_and_phone", use: auth)
+        userRouter.post(String.self, at: "get_code", use: getCode)
+        userRouter.post(ChangePasswordData.self, at:"change_password", use: changePasswordHandler)
         
         let tokenRouter = router.grouped("api", "token")
         tokenRouter.post(LongTokenData.self, at: "short", use: getShortTokenHandler)
         tokenRouter.post(LongTokenData.self, at: "long", use: getLongTokenHandler)
     }
     
-    //  内部api，发送短信
+    
+//  内部api，发送短信
     func getPhoneNumberCode(_ req: Request, number: String, code: String) throws -> Future<Bool>  {
         // 发短信给手机号
         let promise = req.eventLoop.newPromise(Bool.self)
@@ -32,8 +37,7 @@ struct LoginUserController: RouteCollection {
         /// Dispatch some work to happen on a background thread
         DispatchQueue.global().async {
             //发送短信
-            
-            //
+ //
             let ok = true
             promise.succeed(result: ok)
         }
@@ -43,45 +47,10 @@ struct LoginUserController: RouteCollection {
         
     }
     
-     //MARK: --API
-     // api - https://120.78.148.54/api/get_time_Interval
-    func getTimeInterval(_ req: Request) throws -> Future<Response> {
-        let timeInterval = Date().timeIntervalSince1970
-        return try ResponseJSON<TimeInterval>(status: .ok, data:timeInterval).encode(for: req)
-    }
-
-    // api - https://120.78.148.54/api/user/verify_username_and_phone
-    // 验证用户名和手机账号是否被注册过
-    func auth(_ req: Request, userAndPhone:UsernameAndPhoneData) throws -> Future<Response> {
-        return LoginUser.query(on: req).group(.or) { or in
-            or.filter(\.username == userAndPhone.username)
-            or.filter(\.phone == userAndPhone.phone)
-            }
-            .first().flatMap { user in
-                guard user == nil else {
-                    if user!.username == userAndPhone.username {
-                        return try ResponseJSON<Empty>(status: .userExist).encode(for: req)
-                    }else if user!.phone == userAndPhone.phone {
-                        return try ResponseJSON<Empty>(status: .phoneRegistered).encode(for: req)
-                    }
-                    return try ResponseJSON<Empty>(status: .error).encode(for: req)
-                }
-                let code = "vapor"
-                //发送短信
-                return  try self.getPhoneNumberCode(req, number: userAndPhone.phone, code: code).flatMap{ ok in
-                    if ok {
-                        return try ResponseJSON<Empty>(status: .ok, message: "用户名和手机均为被使用,已发送短信验证码、、").encode(for: req)
-                    } else {
-                        return try ResponseJSON<Empty>(status: .error, message: "用户名和手机均为被使用,但是发送短信失败").encode(for: req)
-                    }
-                    
-                }
-  
-        }
-    }
-   
+//MARK: --注册类API
     
-    // api - https://120.78.148.54/api/user/register/(code)
+// api - https://120.78.148.54/api/user/register/(code)
+// 注册用户
     func registerHandler(_ req: Request, loginUser:LoginUser) throws -> Future<Response> {
         //验证码校验
         let code = try req.parameters.next(String.self)
@@ -96,7 +65,7 @@ struct LoginUserController: RouteCollection {
             or.filter(\.phone == loginUser.phone)
             }
             .first().flatMap { user in
-            
+                
                 guard user == nil else {
                     if user!.username == loginUser.username {
                         return try ResponseJSON<Empty>(status: .userExist).encode(for: req)
@@ -108,16 +77,40 @@ struct LoginUserController: RouteCollection {
                 return loginUser.save(on: req).flatMap{ _ in
                     return try ResponseJSON<Empty>(status: .ok, message: "注册成功").encode(for: req)
                 }
-            }
-      
+        }
+        
     }
     
-//    // api - https://120.78.148.54/api/new_password/(code)
-//    func changePasswordHandler(_ req: Request, userData:) throws -> Future<Response> {
-//        <#function body#>
-//    }
     
-    // api - https://120.78.148.54/api/user/login
+    
+//MARK: --登录类api
+// api - https://120.78.148.54/api/get_time_interval
+// 校准时间
+    func getTimeInterval(_ req: Request) throws -> Future<Response> {
+        let timeInterval = Date().timeIntervalSince1970
+        return try ResponseJSON<TimeInterval>(status: .ok, data:timeInterval).encode(for: req)
+    }
+    
+
+// api - https://120.78.148.54/api/user/get_key
+// 验证新设备，获取key
+    func getLoginUserKeyHandler(_ req: Request, data: GetKeyData) throws -> Future<Response> {
+        //验证设备（短信验证）
+        let code = "vapor"
+        guard data.code == code else {
+            return try ResponseJSON<Empty>(status: .codeError).encode(for: req)
+        }
+        return LoginUser.query(on: req).filter(\.username == data.username).filter(\.phone == data.phone).first().flatMap { user in
+            guard let user = user else {
+                return try ResponseJSON<Empty>(status: .error).encode(for: req)
+            }
+            return try ResponseJSON<String>(status: .ok, message: "获取key成功", data: user.key).encode(for: req)
+            
+        }
+    }
+    
+// api - https://120.78.148.54/api/user/login
+// 登录
     func loginHandler(_ req: Request, loginData: LoginData) throws -> Future<Response> {
         // 1,通过账号名搜索用户
         let searchTerm = loginData.username
@@ -165,6 +158,9 @@ struct LoginUserController: RouteCollection {
     }
     
 
+// MARK: --更换长短token api
+    
+// api - https://120.78.148.54/api/token/short
     func getShortTokenHandler(_ req: Request, longTokenData:LongTokenData) throws -> Future<Response> {
 
         // 验证longToken
@@ -180,14 +176,14 @@ struct LoginUserController: RouteCollection {
                 }
                 // 生成短Token并保存
                 return try tokenTep.makeNewShortToken().save(on: req).flatMap { token in
-                    let shortToken = ShortToken(userID:token.userID, shortTokenString: token.shortTokenString, shortTokenExpiryTime: token.shortTokenExpiryTime)
-                    return try ResponseJSON<ShortToken>(status: .ok, message: "更换短token成功", data: shortToken).encode(for: req)
+                    let shortToken = ShortTokenData(userID:token.userID, shortTokenString: token.shortTokenString)
+                    return try ResponseJSON<ShortTokenData>(status: .ok, message: "更换短token成功", data: shortToken).encode(for: req)
                 }
         }
     }
     
     
-    
+// api - https://120.78.148.54/api/token/long
     func getLongTokenHandler(_ req: Request, longTokenData: LongTokenData) throws -> Future<Response> {
         // 验证longToken
         let longToken = longTokenData.longTokenString
@@ -209,25 +205,51 @@ struct LoginUserController: RouteCollection {
         }
     }
 
+
     
-    func getLoginUserKeyHandler(_ req: Request, phoneData: PhoneData) throws -> Future<Response> {
-        //验证设备（短信验证）
+//MARK: --修改密码 api
+    
+// api - https://120.78.148.54/api/user/change_password
+    func changePasswordHandler(_ req: Request, data: ChangePasswordData) throws -> Future<Response> {
+        //验证手机设备（短信验证）
         let code = "vapor"
-        guard phoneData.code == code else {
+        guard data.code == code else {
             return try ResponseJSON<Empty>(status: .codeError).encode(for: req)
         }
-        return LoginUser.query(on: req).filter(\.username == phoneData.username).filter(\.phone == phoneData.phone).first().flatMap { user in
+        
+        return LoginUser.query(on: req).filter(\.username == data.username).filter(\.phone == data.phone).first().flatMap { user in
             guard let user = user else {
-                return try ResponseJSON<Empty>(status: .error).encode(for: req)
+                return try ResponseJSON<Empty>(status: .userNotExist).encode(for: req)
             }
-            return try ResponseJSON<String>(status: .ok, message: "获取key成功", data: user.key).encode(for: req)
+            user.key = data.key
+            user.password = data.password
+            user.password = data.password
+            return user.save(on: req).flatMap { _ in
+                return try ResponseJSON<Empty>(status: .ok, message: "修改密码成功").encode(for: req)
+                
+            }
+        }
+    
+    }
+    
+// MARK: -- 获取短信验证码
+// api - https://120.78.148.54/api/user/get_code
+    // 获取短信验证码
+    func getCode(_ req: Request, phone:String) throws -> Future<Response> {
+        let code = "vapor"
+        //发送短信
+        return  try self.getPhoneNumberCode(req, number: phone, code: code).flatMap{ ok in
+            if ok {
+                return try ResponseJSON<Empty>(status: .ok, message: "已发送短信验证码、、").encode(for: req)
+            } else {
+                return try ResponseJSON<Empty>(status: .error, message: "发送短信失败").encode(for: req)
+            }
             
         }
     }
     
     
-    
-    //MARK: --发送短信验证码,模拟测试用
+//MARK: --发送短信验证码,模拟测试用
     //1，注册
     //2，认证设备
     //3，找回密码
@@ -240,7 +262,7 @@ struct LoginUserController: RouteCollection {
     
     
     
-//MARK: --    测试
+//MARK: --  测试
     func getAllTokens(_ req: Request) -> Future<Response> {
         return Token.query(on: req).all().flatMap{ tokens in
             return try ResponseJSON<[Token]>(status: .ok, data: tokens).encode(for: req)
@@ -263,13 +285,7 @@ struct LoginUserController: RouteCollection {
             }
         }
     }
-    struct PasswordData: Content {
-        var password: String
-        var key: String
-    }
-    func getPassword(_ req: Request, pass: PasswordData) throws -> Future<Response> {
-        let s = try HMAC.SHA1.authenticate(pass.password, key: pass.key).base64EncodedString()
-        return try ResponseJSON<String>(status: .ok, data: s).encode(for: req)
-    }
- 
+  
+    
+    
 }
