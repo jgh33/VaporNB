@@ -15,12 +15,13 @@ struct LoginUserController: RouteCollection {
         
         
         
-        router.get("api","get_time_interval", use: getTimeInterval)
+        router.get("api","get_time_interval", use: getTimeIntervalHandler)
         
         let userRouter = router.grouped("api", "user")
         userRouter.post(LoginUser.self, at:"register", String.parameter, use: registerHandler)
         userRouter.post(LoginData.self,at: "login", use: loginHandler)
-        userRouter.post(String.self, at: "get_code", use: getCode)
+        userRouter.get("get_code", String.parameter, use: getCodeHandler)
+        userRouter.get("get_phone", String.parameter, use: getUserPhoneHandler)
         userRouter.post(ChangePasswordData.self, at:"change_password", use: changePasswordHandler)
         
         let tokenRouter = router.grouped("api", "token")
@@ -86,11 +87,23 @@ struct LoginUserController: RouteCollection {
 //MARK: --登录类api
 // api - https://120.78.148.54/api/get_time_interval
 // 校准时间
-    func getTimeInterval(_ req: Request) throws -> Future<Response> {
+    func getTimeIntervalHandler(_ req: Request) throws -> Future<Response> {
         let timeInterval = Date().timeIntervalSince1970
         return try ResponseJSON<TimeInterval>(status: .ok, data:timeInterval).encode(for: req)
     }
     
+// api - https://120.78.148.54/api/user/get_phone
+// 通过用户名获取用户手机号码
+    func getUserPhoneHandler(_ req: Request) throws -> Future<Response> {
+        let username = try req.parameters.next(String.self)
+        return LoginUser.query(on: req).filter(\.username == username).first().flatMap { user in
+            guard let user = user else {
+                return try ResponseJSON<Empty>(status: .userNotExist).encode(for: req)
+            }
+            return try ResponseJSON<String>(status: .ok, message:"获取用户电话号码成功", data: user.phone).encode(for: req)
+
+        }
+    }
 
 // api - https://120.78.148.54/api/user/get_key
 // 验证新设备，获取key
@@ -235,8 +248,10 @@ struct LoginUserController: RouteCollection {
 // MARK: -- 获取短信验证码
 // api - https://120.78.148.54/api/user/get_code
     // 获取短信验证码
-    func getCode(_ req: Request, phone:String) throws -> Future<Response> {
+    func getCodeHandler(_ req: Request) throws -> Future<Response> {
+        let phone = try req.parameters.next(String.self)
         let code = "vapor"
+
         //发送短信
         return  try self.getPhoneNumberCode(req, number: phone, code: code).flatMap{ ok in
             if ok {
@@ -247,6 +262,8 @@ struct LoginUserController: RouteCollection {
             
         }
     }
+    
+    
     
     
 //MARK: --发送短信验证码,模拟测试用
