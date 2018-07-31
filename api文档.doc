@@ -1,0 +1,624 @@
+
+        <html xmlns:v="urn:schemas-microsoft-com:vml"
+        xmlns:o="urn:schemas-microsoft-com:office:office"
+        xmlns:w="urn:schemas-microsoft-com:office:word"
+        xmlns="http://www.w3.org/TR/REC-html40">
+        <head><meta http-equiv=Content-Type content="text/html;  
+        charset=utf-8">
+        <style type="text/css">
+            table  
+            {  
+                border-collapse: collapse;
+                border: none;  
+                width: 100%;  
+            }  
+            td  
+            {  
+                border: solid #CCC 1px;  
+            }  
+            .codestyle{
+                word-break: break-all;
+                background:silver;mso-highlight:silver;
+            }
+        </style>
+        <meta name=ProgId content=Word.Document>
+        <meta name=Generator content="Microsoft Word 11">
+        <meta name=Originator content="Microsoft Word 11">
+        <xml><w:WordDocument><w:View>Print</w:View></xml></head>
+        <body><h1>1、用户相关</h1><div style="margin-left:20px;"><h2>1.1、获取短信验证码</h2><div style="margin-left:20px;"><p><strong>简要描述：</strong> </p>
+<ul>
+<li>获取验证码接口</li>
+</ul>
+<p><strong>请求URL：</strong> </p>
+<ul>
+<li><code>https://120.78.148.54/api/user/get_code</code></li>
+</ul>
+<p><strong>请求方式：</strong></p>
+<ul>
+<li>POST </li>
+</ul>
+<p><strong>参数：</strong> </p>
+<table>
+<thead><tr style='background-color: rgb(0, 136, 204); color: rgb(255, 255, 255);'>
+<th style="text-align: left;">参数名</th>
+<th style="text-align: left;">必选</th>
+<th style="text-align: left;">类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">phone</td>
+<td style="text-align: left;">是</td>
+<td style="text-align: left;">string</td>
+<td>手机号码</td>
+</tr>
+</tbody>
+</table>
+<p><strong>返回示例</strong></p>
+<table width='100%' class='codestyle'><pre><code> {
+    &quot;status&quot;: 0,
+    &quot;message&quot;: &quot;已发送短信验证码&quot;
+}</code></pre></table>
+<p><strong>返回参数说明</strong> </p>
+<table>
+<thead><tr style='background-color: rgb(0, 136, 204); color: rgb(255, 255, 255);'>
+<th style="text-align: left;">参数名</th>
+<th style="text-align: left;">类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">status</td>
+<td style="text-align: left;">int</td>
+<td>返回状态码，0：成功</td>
+</tr>
+<tr>
+<td style="text-align: left;">message</td>
+<td style="text-align: left;">string</td>
+<td>返回说明</td>
+</tr>
+</tbody>
+</table>
+<p><strong>备注</strong> </p>
+<ul>
+<li>调用api前，客户端要先对手机号的格式做验证</li>
+<li>更多返回错误代码请看首页的错误代码描述</li>
+</ul></div><h2>1.2、用户注册api</h2><div style="margin-left:20px;"><p><strong>简要描述：</strong> </p>
+<ul>
+<li>用户注册接口</li>
+</ul>
+<p><strong>请求URL：</strong> </p>
+<ul>
+<li><code>https://120.78.148.54/api/user/register/(code)</code></li>
+</ul>
+<p><strong>请求方式：</strong></p>
+<ul>
+<li>POST </li>
+</ul>
+<p><strong>参数：</strong> </p>
+<table>
+<thead><tr style='background-color: rgb(0, 136, 204); color: rgb(255, 255, 255);'>
+<th style="text-align: left;">参数名</th>
+<th style="text-align: left;">必选</th>
+<th style="text-align: left;">类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">username</td>
+<td style="text-align: left;">是</td>
+<td style="text-align: left;">string</td>
+<td>用户名</td>
+</tr>
+<tr>
+<td style="text-align: left;">password</td>
+<td style="text-align: left;">是</td>
+<td style="text-align: left;">string</td>
+<td>加密后的密码</td>
+</tr>
+<tr>
+<td style="text-align: left;">key</td>
+<td style="text-align: left;">是</td>
+<td style="text-align: left;">string</td>
+<td>加密秘钥</td>
+</tr>
+<tr>
+<td style="text-align: left;">phone</td>
+<td style="text-align: left;">是</td>
+<td style="text-align: left;">string</td>
+<td>电话号码</td>
+</tr>
+</tbody>
+</table>
+<p><strong>返回示例</strong></p>
+<table width='100%' class='codestyle'><pre><code>  {
+    &quot;status&quot;: 0,
+    &quot;message&quot;: &quot;注册成功&quot;
+}</code></pre></table>
+<p><strong>返回参数说明</strong> </p>
+<table>
+<thead><tr style='background-color: rgb(0, 136, 204); color: rgb(255, 255, 255);'>
+<th style="text-align: left;">参数名</th>
+<th style="text-align: left;">类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">status</td>
+<td style="text-align: left;">int</td>
+<td>返回状态码，0：成功</td>
+</tr>
+<tr>
+<td style="text-align: left;">message</td>
+<td style="text-align: left;">string</td>
+<td>返回说明</td>
+</tr>
+</tbody>
+</table>
+<p><strong>备注</strong> </p>
+<ul>
+<li>请求的url最后一个code是短信验证码，为了不破坏数据结构，将code提到URL中</li>
+<li>默认验证码为vapor</li>
+<li>更多返回错误代码请看首页的错误代码描述</li>
+</ul></div><h2>1.3、时间校准api</h2><div style="margin-left:20px;"><p><strong>简要描述：</strong> </p>
+<ul>
+<li>客户端与服务器时间差接口</li>
+</ul>
+<p><strong>请求URL：</strong> </p>
+<ul>
+<li><code>https://120.78.148.54/api/get_time_interval</code></li>
+</ul>
+<p><strong>请求方式：</strong></p>
+<ul>
+<li>get </li>
+</ul>
+<p><strong>参数：</strong> </p>
+<ul>
+<li>
+<p>无</p>
+<p><strong>返回示例</strong></p>
+</li>
+</ul>
+<table width='100%' class='codestyle'><pre><code>  {
+    &quot;status&quot;: 0,
+    &quot;message&quot;: &quot;请求成功&quot;,
+    &quot;data&quot;: 1532578492.780617
+}</code></pre></table>
+<p><strong>返回参数说明</strong> </p>
+<table>
+<thead><tr style='background-color: rgb(0, 136, 204); color: rgb(255, 255, 255);'>
+<th style="text-align: left;">参数名</th>
+<th style="text-align: left;">类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">data</td>
+<td style="text-align: left;">Double</td>
+<td>服务器时间since1970</td>
+</tr>
+</tbody>
+</table>
+<p><strong>备注</strong> </p>
+<ul>
+<li>更多返回错误代码请看首页的错误代码描述</li>
+</ul>
+<p>欢迎使用ShowDoc！</p></div><h2>1.4、新设备登录获取key</h2><div style="margin-left:20px;"><p><strong>简要描述：</strong> </p>
+<ul>
+<li>新设备登录获取key</li>
+</ul>
+<p><strong>请求URL：</strong> </p>
+<ul>
+<li><code>https://120.78.148.54/api/user/get_key</code></li>
+</ul>
+<p><strong>请求方式：</strong></p>
+<ul>
+<li>POST </li>
+</ul>
+<p><strong>参数：</strong> </p>
+<table>
+<thead><tr style='background-color: rgb(0, 136, 204); color: rgb(255, 255, 255);'>
+<th style="text-align: left;">参数名</th>
+<th style="text-align: left;">必选</th>
+<th style="text-align: left;">类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">username</td>
+<td style="text-align: left;">是</td>
+<td style="text-align: left;">string</td>
+<td>用户名</td>
+</tr>
+<tr>
+<td style="text-align: left;">phone</td>
+<td style="text-align: left;">是</td>
+<td style="text-align: left;">string</td>
+<td>电话号码</td>
+</tr>
+<tr>
+<td style="text-align: left;">code</td>
+<td style="text-align: left;">是</td>
+<td style="text-align: left;">string</td>
+<td>短信验证码</td>
+</tr>
+</tbody>
+</table>
+<p><strong>返回示例</strong></p>
+<table width='100%' class='codestyle'><pre><code>  {
+    &quot;error_code&quot;: 0,
+    &quot;data&quot;: {
+      &quot;uid&quot;: &quot;1&quot;,
+      &quot;username&quot;: &quot;12154545&quot;,
+      &quot;name&quot;: &quot;吴系挂&quot;,
+      &quot;groupid&quot;: 2 ,
+      &quot;reg_time&quot;: &quot;1436864169&quot;,
+      &quot;last_login_time&quot;: &quot;0&quot;,
+    }
+  }</code></pre></table>
+<p><strong>返回参数说明</strong> </p>
+<table>
+<thead><tr style='background-color: rgb(0, 136, 204); color: rgb(255, 255, 255);'>
+<th style="text-align: left;">参数名</th>
+<th style="text-align: left;">类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">groupid</td>
+<td style="text-align: left;">int</td>
+<td>用户组id，1：超级管理员；2：普通用户</td>
+</tr>
+</tbody>
+</table>
+<p><strong>备注</strong> </p>
+<ul>
+<li>更多返回错误代码请看首页的错误代码描述</li>
+</ul>
+<p>欢迎使用ShowDoc！</p></div><h2>1.5、用户登录api</h2><div style="margin-left:20px;"><p><strong>简要描述：</strong> </p>
+<ul>
+<li>用户登录接口</li>
+</ul>
+<p><strong>请求URL：</strong> </p>
+<ul>
+<li><code>https://120.78.148.54/api/user/login</code></li>
+</ul>
+<p><strong>请求方式：</strong></p>
+<ul>
+<li>POST </li>
+</ul>
+<p><strong>参数：</strong> </p>
+<table>
+<thead><tr style='background-color: rgb(0, 136, 204); color: rgb(255, 255, 255);'>
+<th style="text-align: left;">参数名</th>
+<th style="text-align: left;">必选</th>
+<th style="text-align: left;">类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">username</td>
+<td style="text-align: left;">是</td>
+<td style="text-align: left;">string</td>
+<td>用户名</td>
+</tr>
+<tr>
+<td style="text-align: left;">password</td>
+<td style="text-align: left;">是</td>
+<td style="text-align: left;">string</td>
+<td>密码（hmacsha1加密后的密码）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>返回示例</strong></p>
+<table width='100%' class='codestyle'><pre><code>  {
+    &quot;error_code&quot;: 0,
+    &quot;data&quot;: {
+      &quot;userID&quot;: &quot;1&quot;,
+      &quot;username&quot;: &quot;12154545&quot;,
+      &quot;name&quot;: &quot;吴系挂&quot;,
+      &quot;groupid&quot;: 2 ,
+      &quot;reg_time&quot;: &quot;1436864169&quot;,
+      &quot;last_login_time&quot;: &quot;0&quot;,
+    }
+  }</code></pre></table>
+<p><strong>返回参数说明</strong> </p>
+<table>
+<thead><tr style='background-color: rgb(0, 136, 204); color: rgb(255, 255, 255);'>
+<th style="text-align: left;">参数名</th>
+<th style="text-align: left;">类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">groupid</td>
+<td style="text-align: left;">int</td>
+<td>用户组id，1：超级管理员；2：普通用户</td>
+</tr>
+</tbody>
+</table>
+<p><strong>备注</strong> </p>
+<ul>
+<li>更多返回错误代码请看首页的错误代码描述</li>
+</ul></div><h2>1.6、修改密码</h2><div style="margin-left:20px;"><p><strong>简要描述：</strong> </p>
+<ul>
+<li>用户修改密码接口</li>
+</ul>
+<p><strong>请求URL：</strong> </p>
+<ul>
+<li><code>https://120.78.148.54/api/user/change_password</code></li>
+</ul>
+<p><strong>请求方式：</strong></p>
+<ul>
+<li>POST </li>
+</ul>
+<p><strong>参数：</strong> </p>
+<table>
+<thead><tr style='background-color: rgb(0, 136, 204); color: rgb(255, 255, 255);'>
+<th style="text-align: left;">参数名</th>
+<th style="text-align: left;">必选</th>
+<th style="text-align: left;">类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">username</td>
+<td style="text-align: left;">是</td>
+<td style="text-align: left;">string</td>
+<td>用户名</td>
+</tr>
+<tr>
+<td style="text-align: left;">password</td>
+<td style="text-align: left;">是</td>
+<td style="text-align: left;">string</td>
+<td>加密过后的密码</td>
+</tr>
+<tr>
+<td style="text-align: left;">key</td>
+<td style="text-align: left;">是</td>
+<td style="text-align: left;">string</td>
+<td>加密字符串</td>
+</tr>
+<tr>
+<td style="text-align: left;">phone</td>
+<td style="text-align: left;">是</td>
+<td style="text-align: left;">string</td>
+<td>手机号</td>
+</tr>
+<tr>
+<td style="text-align: left;">code</td>
+<td style="text-align: left;">是</td>
+<td style="text-align: left;">string</td>
+<td>验证码</td>
+</tr>
+</tbody>
+</table>
+<p><strong>返回示例</strong></p>
+<table width='100%' class='codestyle'><pre><code>  {
+    &quot;error_code&quot;: 0,
+    &quot;data&quot;: {
+      &quot;uid&quot;: &quot;1&quot;,
+      &quot;username&quot;: &quot;12154545&quot;,
+      &quot;name&quot;: &quot;吴系挂&quot;,
+      &quot;groupid&quot;: 2 ,
+      &quot;reg_time&quot;: &quot;1436864169&quot;,
+      &quot;last_login_time&quot;: &quot;0&quot;,
+    }
+  }</code></pre></table>
+<p><strong>返回参数说明</strong> </p>
+<table>
+<thead><tr style='background-color: rgb(0, 136, 204); color: rgb(255, 255, 255);'>
+<th style="text-align: left;">参数名</th>
+<th style="text-align: left;">类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">groupid</td>
+<td style="text-align: left;">int</td>
+<td>用户组id，1：超级管理员；2：普通用户</td>
+</tr>
+</tbody>
+</table>
+<p><strong>备注</strong> </p>
+<ul>
+<li>更多返回错误代码请看首页的错误代码描述</li>
+</ul>
+<p>欢迎使用ShowDoc！</p></div><h2>1.7、更换短token</h2><div style="margin-left:20px;"><p><strong>简要描述：</strong> </p>
+<ul>
+<li>更换短token的api，短token用于认证用户，获取数据</li>
+</ul>
+<p><strong>请求URL：</strong> </p>
+<ul>
+<li><code>https://120.78.148.54/api/token/short</code></li>
+</ul>
+<p><strong>请求方式：</strong></p>
+<ul>
+<li>POST </li>
+</ul>
+<p><strong>提交参数：</strong> </p>
+<table>
+<thead><tr style='background-color: rgb(0, 136, 204); color: rgb(255, 255, 255);'>
+<th style="text-align: left;">参数名</th>
+<th style="text-align: left;">必选</th>
+<th style="text-align: left;">类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">userID</td>
+<td style="text-align: left;">是</td>
+<td style="text-align: left;">string</td>
+<td>用户ID</td>
+</tr>
+<tr>
+<td style="text-align: left;">longTokenString</td>
+<td style="text-align: left;">是</td>
+<td style="text-align: left;">string</td>
+<td>长token</td>
+</tr>
+</tbody>
+</table>
+<p><strong>返回示例</strong></p>
+<table width='100%' class='codestyle'><pre><code>  {
+    &quot;status&quot; :  0,
+    &quot;message&quot;:  &quot;更换短token成功&quot;,
+    &quot;data&quot;:
+               {
+                 &quot;userID&quot;:  8,
+                 &quot;shortTokenString&quot;:  &quot;O3bgSkAMf5pq3tXxhgCerlyELu8AQzeaU2rIBoCdyV8&quot;
+               }
+ }</code></pre></table>
+<p><strong>返回参数说明</strong> </p>
+<table>
+<thead><tr style='background-color: rgb(0, 136, 204); color: rgb(255, 255, 255);'>
+<th style="text-align: left;">参数名</th>
+<th style="text-align: left;">类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">status</td>
+<td style="text-align: left;">int</td>
+<td>返回状态码，0为成功</td>
+</tr>
+<tr>
+<td style="text-align: left;">message</td>
+<td style="text-align: left;">string</td>
+<td>返回说明</td>
+</tr>
+<tr>
+<td style="text-align: left;">userID</td>
+<td style="text-align: left;">int</td>
+<td>data下的用户id</td>
+</tr>
+<tr>
+<td style="text-align: left;">shortTokenString</td>
+<td style="text-align: left;">string</td>
+<td>新的短token</td>
+</tr>
+</tbody>
+</table>
+<p><strong>备注</strong> </p>
+<ul>
+<li>更多返回错误代码请看首页的错误代码描述</li>
+</ul>
+<p>欢迎使用ShowDoc！</p></div><h2>1.8、更换长token</h2><div style="margin-left:20px;"><p><strong>简要描述：</strong> </p>
+<ul>
+<li>用户更换长token的接口</li>
+</ul>
+<p><strong>请求URL：</strong> </p>
+<ul>
+<li><code>https://120.78.148.54/api/token/long</code></li>
+</ul>
+<p><strong>请求方式：</strong></p>
+<ul>
+<li>POST </li>
+</ul>
+<p><strong>参数：</strong> </p>
+<table>
+<thead><tr style='background-color: rgb(0, 136, 204); color: rgb(255, 255, 255);'>
+<th style="text-align: left;">参数名</th>
+<th style="text-align: left;">必选</th>
+<th style="text-align: left;">类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">userID</td>
+<td style="text-align: left;">是</td>
+<td style="text-align: left;">string</td>
+<td>用户ID</td>
+</tr>
+<tr>
+<td style="text-align: left;">longTokenString</td>
+<td style="text-align: left;">是</td>
+<td style="text-align: left;">string</td>
+<td>长token</td>
+</tr>
+</tbody>
+</table>
+<p><strong>返回示例</strong></p>
+<table width='100%' class='codestyle'><pre><code>{
+  &quot;status&quot;:0,
+  &quot;message&quot;:&quot;更换长token成功&quot;,
+  &quot;data&quot;:
+            {
+              &quot;shortTokenExpiryTime&quot;:1532594753.58812,
+              &quot;id&quot;:4,
+              &quot;shortTokenString&quot;:&quot;h91RXba5J9O814MRlE3tcTZ4Yw2rjmVIruKWnXgu1Ls&quot;,
+              &quot;userID&quot;:8,
+              &quot;longTokenExpiryTime&quot;:1532596253.58812,
+&quot;longTokenString&quot;:&quot;889EfVx_V0omyknmt9TWeuAQEo3XcVO8qJMhmayTREgi6bWxznfKFLWoW1ZHQbLPzqVkUNthBf8CDiBfaYtXg&quot;
+             }
+ }</code></pre></table>
+<p><strong>返回参数说明</strong> </p>
+<table>
+<thead><tr style='background-color: rgb(0, 136, 204); color: rgb(255, 255, 255);'>
+<th style="text-align: left;">参数名</th>
+<th style="text-align: left;">类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">status</td>
+<td style="text-align: left;">int</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align: left;">message</td>
+<td style="text-align: left;">string</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align: left;">shortTokenExpiryTime</td>
+<td style="text-align: left;">double</td>
+<td>新的短token有效期</td>
+</tr>
+<tr>
+<td style="text-align: left;">id</td>
+<td style="text-align: left;">int</td>
+<td>token的id</td>
+</tr>
+<tr>
+<td style="text-align: left;">shortTokenString</td>
+<td style="text-align: left;">string</td>
+<td>新的短token</td>
+</tr>
+<tr>
+<td style="text-align: left;">userID</td>
+<td style="text-align: left;">int</td>
+<td>data下的用户id</td>
+</tr>
+<tr>
+<td style="text-align: left;">longTokenExpiryTime</td>
+<td style="text-align: left;">double</td>
+<td>新的长token有效期</td>
+</tr>
+<tr>
+<td style="text-align: left;">longTokenString</td>
+<td style="text-align: left;">string</td>
+<td>新的长token</td>
+</tr>
+</tbody>
+</table>
+<p><strong>备注</strong> </p>
+<ul>
+<li>更多返回错误代码请看首页的错误代码描述</li>
+</ul>
+<p>欢迎使用ShowDoc！</p></div></div></body></html>
