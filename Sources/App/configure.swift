@@ -23,7 +23,7 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
         port: 5432,
         username: "jgh",
         database: "vapornb",
-        password: nil
+        password: "123"
     )
     services.register(postgresqlConfig)
 
