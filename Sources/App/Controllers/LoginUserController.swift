@@ -22,6 +22,7 @@ struct LoginUserController: RouteCollection {
         userRouter.post(LoginData.self,at: "login", use: loginHandler)
         userRouter.get("get_code", String.parameter, use: getCodeHandler)
         userRouter.get("get_phone", String.parameter, use: getUserPhoneHandler)
+        userRouter.post(GetKeyData.self, at: "get_key", use: getLoginUserKeyHandler)
         userRouter.post(ChangePasswordData.self, at:"change_password", use: changePasswordHandler)
         
         let tokenRouter = router.grouped("api", "token")
