@@ -18,12 +18,21 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
     services.register(middlewares)
 
     // Configure a postgreSQL database
+    var username = ""
+    var password = ""
+    #if os(Linux)
+    username = "ubuntu"
+    password = "123321"
+    #else
+    username = "jgh"
+    password = "123"
+    #endif
     let postgresqlConfig = PostgreSQLDatabaseConfig(
         hostname: "127.0.0.1",
         port: 5432,
-        username: "jgh",
+        username: username,
         database: "vapornb",
-        password: "123"
+        password: password
     )
     services.register(postgresqlConfig)
 
